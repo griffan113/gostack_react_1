@@ -9,8 +9,16 @@ import { FiChevronRight } from 'react-icons/fi';
 import { MdClear } from 'react-icons/md';
 import { Link } from 'react-router-dom';
 
-import { Title, Form, Button, Repositories, Error } from './styles';
+import {
+  Title,
+  Form,
+  Button,
+  Repositories,
+  Error,
+  NoRepositories,
+} from './styles';
 import logo from '../../assets/logo_eliel.png';
+import octocat from '../../assets/octocat.png';
 import api from '../../services/api';
 
 interface Repository {
@@ -88,6 +96,12 @@ const Dashboard: React.FC = () => {
           </Link>
         ))}
       </Repositories>
+      {repositories.length < 1 && (
+        <NoRepositories>
+          <strong>Digite um repositório para ver suas informações!</strong>
+          <img src={octocat} alt="GitHub Octocat" />
+        </NoRepositories>
+      )}
     </Fragment>
   );
 };

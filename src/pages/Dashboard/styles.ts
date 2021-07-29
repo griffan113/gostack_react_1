@@ -141,3 +141,19 @@ export const Repositories = styled.div`
     }
   }
 `;
+
+export const NoRepositories = styled.section`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+
+  img {
+    width: 350px;
+  }
+
+  strong {
+    margin-bottom: 20px;
+    color: #a8a8b3;
+  }
+`;
