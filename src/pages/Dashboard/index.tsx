@@ -1,7 +1,7 @@
 import React, { Fragment, useState, useEffect, useRef, FormEvent } from 'react';
 import { FiChevronRight } from 'react-icons/fi';
 
-import { Title, Form, Input, Button, Repositories } from './styles';
+import { Title, Form, Input, Button, Repositories, Error } from './styles';
 import logo from '../../assets/logo_eliel.png';
 import api from '../../services/api';
 
@@ -16,18 +16,27 @@ interface Repository {
 
 const Dashboard: React.FC = () => {
   const [repositories, setRepositories] = useState<Repository[]>([]);
+  const [inputError, setInputError] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
 
   async function handleAddRepository(
     event: FormEvent<HTMLFormElement>
   ): Promise<void> {
     event.preventDefault();
-
     const newRepo = inputRef.current?.value;
-    const response = await api.get<Repository>(`repos/${newRepo}`);
-    const repository = response.data;
 
-    setRepositories([...repositories, repository]);
+    if (!newRepo) {
+      setInputError('Digite o autor/nome_do_repositório.');
+    }
+
+    try {
+      const response = await api.get<Repository>(`repos/${newRepo}`);
+      const repository = response.data;
+
+      setRepositories([...repositories, repository]);
+    } catch (err) {
+      setInputError('Erro na busca por esse repositório.');
+    }
   }
 
   return (
@@ -38,6 +47,7 @@ const Dashboard: React.FC = () => {
         <Input ref={inputRef} placeholder="Digite o nome do repositório..." />
         <Button type="submit">Pesquisar</Button>
       </Form>
+      {inputError && <Error>{inputError}</Error>}
       <Repositories>
         {repositories.map((repository) => (
           <a key={repository.full_name} href="test">
