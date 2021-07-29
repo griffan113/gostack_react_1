@@ -1,7 +1,16 @@
-import React from "react";
+import React from 'react';
+import { useRouteMatch } from 'react-router';
+
+import { Header } from './styles';
+
+interface RepositoryParams {
+  repository: string;
+}
 
 const Repository: React.FC = () => {
-  return <h1>Repository</h1>;
+  const { params } = useRouteMatch<RepositoryParams>();
+
+  return <Header></Header>;
 };
 
 export default Repository;

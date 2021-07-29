@@ -1,7 +1,15 @@
-import React, { Fragment, useState, useEffect, useRef, FormEvent } from 'react';
+import React, {
+  Fragment,
+  useState,
+  useRef,
+  FormEvent,
+  useCallback,
+} from 'react';
 import { FiChevronRight } from 'react-icons/fi';
+import { MdClear } from 'react-icons/md';
+import { Link } from 'react-router-dom';
 
-import { Title, Form, Input, Button, Repositories, Error } from './styles';
+import { Title, Form, Button, Repositories, Error } from './styles';
 import logo from '../../assets/logo_eliel.png';
 import api from '../../services/api';
 
@@ -19,6 +27,11 @@ const Dashboard: React.FC = () => {
   const [inputError, setInputError] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
 
+  const handleClearInput = useCallback(() => {
+    setInputError('');
+    if (inputRef.current !== null) inputRef.current.value = '';
+  }, []);
+
   async function handleAddRepository(
     event: FormEvent<HTMLFormElement>
   ): Promise<void> {
@@ -27,6 +40,8 @@ const Dashboard: React.FC = () => {
 
     if (!newRepo) {
       setInputError('Digite o autor/nome_do_repositório.');
+      inputRef.current?.focus();
+      return;
     }
 
     try {
@@ -34,8 +49,11 @@ const Dashboard: React.FC = () => {
       const repository = response.data;
 
       setRepositories([...repositories, repository]);
+      if (inputRef.current !== null) inputRef.current.value = '';
+      setInputError('');
     } catch (err) {
       setInputError('Erro na busca por esse repositório.');
+      inputRef.current?.focus();
     }
   }
 
@@ -43,14 +61,21 @@ const Dashboard: React.FC = () => {
     <Fragment>
       <img style={{ maxWidth: '100px' }} src={logo} alt="logo" />
       <Title>Explore Repositórios no GitHub</Title>
-      <Form onSubmit={handleAddRepository}>
-        <Input ref={inputRef} placeholder="Digite o nome do repositório..." />
+      {/* "!!" indicates a string value to boolean; */}
+      <Form hasError={!!inputError} onSubmit={handleAddRepository}>
+        <input ref={inputRef} placeholder="Digite o nome do repositório..." />
+        <span onClick={handleClearInput}>
+          <MdClear size={20} />
+        </span>
         <Button type="submit">Pesquisar</Button>
       </Form>
       {inputError && <Error>{inputError}</Error>}
       <Repositories>
         {repositories.map((repository) => (
-          <a key={repository.full_name} href="test">
+          <Link
+            key={repository.full_name}
+            to={`/repository/${repository.full_name}`}
+          >
             <img
               src={repository.owner.avatar_url}
               alt={repository.owner.login}
@@ -60,7 +85,7 @@ const Dashboard: React.FC = () => {
               <p>{repository.description}</p>
             </div>
             <FiChevronRight size={20} />
-          </a>
+          </Link>
         ))}
       </Repositories>
     </Fragment>
